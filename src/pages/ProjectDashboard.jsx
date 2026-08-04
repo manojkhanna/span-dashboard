@@ -17,6 +17,7 @@ import WeightBreakdown from '../components/WeightBreakdown'
 import RfiBySequence from '../components/RfiBySequence'
 import ExternalErrors from '../components/ExternalErrors'
 import IfcModelSummary from '../components/IfcModelSummary'
+import IfcViewer from '../components/IfcViewer'
 
 const dimensionLabels = {
   progress: 'Progress',
@@ -165,6 +166,9 @@ export default function ProjectDashboard() {
             <WeightBreakdown data={progress} project={project} />
           </div>
         )}
+
+        {/* 3D Model Viewer (if IFC data available) */}
+        {ifc && <IfcViewer />}
 
         {/* Row 4: Forecast */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
