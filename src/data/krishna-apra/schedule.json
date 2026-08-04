@@ -1,0 +1,16 @@
+[
+  { "milestone": "Site Assessment Complete", "sequence": "All", "planned": "2025-02-01", "actual": "2025-02-01", "status": "completed" },
+  { "milestone": "Tower A Waterproofing Start", "sequence": "Tower A — Waterproofing", "planned": "2025-03-01", "actual": "2025-03-05", "status": "completed" },
+  { "milestone": "Tower B Waterproofing Start", "sequence": "Tower B — Waterproofing", "planned": "2025-03-15", "actual": "2025-03-28", "status": "completed" },
+  { "milestone": "Tower A Structural Repair Start", "sequence": "Tower A — Structural Repair", "planned": "2025-04-15", "actual": "2025-05-02", "status": "completed" },
+  { "milestone": "Common Areas Plumbing Start", "sequence": "Common Areas — Plumbing", "planned": "2025-05-01", "actual": "2025-05-20", "status": "completed" },
+  { "milestone": "Tower A Waterproofing Complete", "sequence": "Tower A — Waterproofing", "planned": "2025-06-15", "actual": "2025-07-10", "status": "completed" },
+  { "milestone": "Basement Seepage Treatment Start", "sequence": "Basement — Seepage", "planned": "2025-06-01", "actual": "2025-07-01", "status": "completed" },
+  { "milestone": "Tower B Structural Repair Start", "sequence": "Tower B — Structural Repair", "planned": "2025-07-01", "actual": null, "status": "delayed" },
+  { "milestone": "Tower B Waterproofing Complete", "sequence": "Tower B — Waterproofing", "planned": "2025-08-01", "actual": null, "status": "delayed" },
+  { "milestone": "Tower A Structural Repair Complete", "sequence": "Tower A — Structural Repair", "planned": "2025-09-15", "actual": null, "status": "in-progress" },
+  { "milestone": "Common Areas Plumbing Complete", "sequence": "Common Areas — Plumbing", "planned": "2025-10-01", "actual": null, "status": "in-progress" },
+  { "milestone": "Basement Seepage Complete", "sequence": "Basement — Seepage", "planned": "2025-10-15", "actual": null, "status": "in-progress" },
+  { "milestone": "Final Inspection", "sequence": "All", "planned": "2025-12-01", "actual": null, "status": "upcoming" },
+  { "milestone": "Project Handover", "sequence": "All", "planned": "2025-12-15", "actual": null, "status": "upcoming" }
+]

@@ -1,0 +1,20 @@
+{
+  "summary": {
+    "total": 46,
+    "closed": 31,
+    "open": 15
+  },
+  "bySequence": [
+    { "sequence": "Tower A WP", "total": 12, "closed": 10, "open": 2 },
+    { "sequence": "Tower A Repair", "total": 8, "closed": 6, "open": 2 },
+    { "sequence": "Tower B WP", "total": 10, "closed": 5, "open": 5 },
+    { "sequence": "Tower B Repair", "total": 6, "closed": 3, "open": 3 },
+    { "sequence": "Plumbing", "total": 5, "closed": 4, "open": 1 },
+    { "sequence": "Basement", "total": 5, "closed": 3, "open": 2 }
+  ],
+  "monthlyTrend": [
+    { "month": "2026-05", "sent": 18, "resolved": 10 },
+    { "month": "2026-06", "sent": 16, "resolved": 14 },
+    { "month": "2026-07", "sent": 12, "resolved": 7 }
+  ]
+}

@@ -1,0 +1,10 @@
+[
+  { "month": "2025-03", "overall": 62, "progress": 55, "quality": 58, "rfi": 50, "changeOrder": 80, "resource": 82 },
+  { "month": "2025-04", "overall": 60, "progress": 52, "quality": 55, "rfi": 48, "changeOrder": 75, "resource": 80 },
+  { "month": "2025-05", "overall": 57, "progress": 50, "quality": 50, "rfi": 42, "changeOrder": 70, "resource": 80 },
+  { "month": "2025-06", "overall": 54, "progress": 48, "quality": 45, "rfi": 38, "changeOrder": 65, "resource": 78 },
+  { "month": "2025-07", "overall": 50, "progress": 46, "quality": 40, "rfi": 32, "changeOrder": 60, "resource": 78 },
+  { "month": "2025-08", "overall": 47, "progress": 45, "quality": 35, "rfi": 28, "changeOrder": 55, "resource": 77 },
+  { "month": "2025-09", "overall": 44, "progress": 44, "quality": 32, "rfi": 25, "changeOrder": 52, "resource": 76 },
+  { "month": "2025-10", "overall": 41, "progress": 43, "quality": 30, "rfi": 22, "changeOrder": 50, "resource": 76 }
+]

@@ -1,0 +1,32 @@
+{
+  "name": "Krishna Apra Residency — Structural Repair",
+  "client": "Krishna Apra RWA, Sector 61, Noida",
+  "projectManager": "Vinay Chaudhari",
+  "teamLeader": "Rohit Mehra",
+  "domain": "repair",
+  "totalWeight": 0,
+  "totalArea": 48500,
+  "unit": "sqft",
+  "changeOrders": {
+    "submitted": 5,
+    "approved": 3,
+    "rejected": 1
+  },
+  "rfiSummary": {
+    "total": 46,
+    "closed": 31,
+    "open": 15
+  },
+  "manCount": [
+    { "week": "2026-05-05", "count": 12 },
+    { "week": "2026-05-12", "count": 14 },
+    { "week": "2026-05-19", "count": 18 },
+    { "week": "2026-05-26", "count": 16 },
+    { "week": "2026-06-02", "count": 22 },
+    { "week": "2026-06-09", "count": 20 },
+    { "week": "2026-06-16", "count": 19 },
+    { "week": "2026-06-23", "count": 24 },
+    { "week": "2026-06-30", "count": 21 },
+    { "week": "2026-07-07", "count": 18 }
+  ]
+}

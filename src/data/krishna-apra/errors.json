@@ -1,0 +1,24 @@
+{
+  "external": [
+    { "month": "2026-05", "type": "Material Substitution", "category": "A", "count": 2 },
+    { "month": "2026-05", "type": "BOQ Mismatch", "category": "B", "count": 3 },
+    { "month": "2026-06", "type": "Workmanship Defect", "category": "B", "count": 4 },
+    { "month": "2026-06", "type": "Material Substitution", "category": "A", "count": 1 },
+    { "month": "2026-06", "type": "Scope Deviation", "category": "B", "count": 2 },
+    { "month": "2026-07", "type": "BOQ Mismatch", "category": "C", "count": 2 },
+    { "month": "2026-07", "type": "Workmanship Defect", "category": "B", "count": 3 },
+    { "month": "2026-07", "type": "Safety Violation", "category": "A", "count": 1 }
+  ],
+  "internal": {
+    "byMonth": [
+      { "month": "2026-05", "catA": 3, "catB": 12, "catC": 5, "total": 20 },
+      { "month": "2026-06", "catA": 2, "catB": 18, "catC": 8, "total": 28 },
+      { "month": "2026-07", "catA": 1, "catB": 14, "catC": 6, "total": 21 }
+    ],
+    "byResourceType": [
+      { "type": "Inspector", "catA": 4, "catB": 15, "catC": 8, "total": 27 },
+      { "type": "Contractor", "catA": 2, "catB": 22, "catC": 7, "total": 31 },
+      { "type": "Supervisor", "catA": 0, "catB": 7, "catC": 4, "total": 11 }
+    ]
+  }
+}

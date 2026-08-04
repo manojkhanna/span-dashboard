@@ -1,0 +1,26 @@
+{
+  "name": "Amtrak Southampton Yard",
+  "client": "Cives-New England Division",
+  "projectManager": "Sagar Bhonge",
+  "teamLeader": "Mahesh Sagar",
+  "domain": "bim",
+  "totalWeight": 1506,
+  "totalArea": 0,
+  "changeOrders": {
+    "submitted": 2,
+    "approved": 2,
+    "rejected": 0
+  },
+  "rfiSummary": {
+    "total": 132,
+    "closed": 124,
+    "open": 8
+  },
+  "manCount": [
+    { "week": "2025-08-15", "count": 16 },
+    { "week": "2025-08-22", "count": 16 },
+    { "week": "2025-08-29", "count": 16 },
+    { "week": "2025-09-05", "count": 16 },
+    { "week": "2025-09-12", "count": 16 }
+  ]
+}

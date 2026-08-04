@@ -1,0 +1,30 @@
+{
+  "external": [
+    { "month": "2025-11", "type": "Other Error", "category": "C", "count": 2 },
+    { "month": "2025-11", "type": "Detailing Error", "category": "B", "count": 1 },
+    { "month": "2026-02", "type": "Detailing Error", "category": "B", "count": 2 },
+    { "month": "2026-03", "type": "Modelling Error", "category": "A", "count": 1 },
+    { "month": "2026-05", "type": "Detailing Error", "category": "B", "count": 3 }
+  ],
+  "internal": {
+    "byMonth": [
+      { "month": "2025-05", "catA": 8, "catB": 0, "catC": 0, "total": 8 },
+      { "month": "2025-06", "catA": 3, "catB": 32, "catC": 0, "total": 35 },
+      { "month": "2025-07", "catA": 4, "catB": 105, "catC": 0, "total": 109 },
+      { "month": "2025-08", "catA": 3, "catB": 292, "catC": 0, "total": 295 },
+      { "month": "2025-09", "catA": 4, "catB": 197, "catC": 0, "total": 201 },
+      { "month": "2025-10", "catA": 0, "catB": 162, "catC": 0, "total": 162 },
+      { "month": "2025-11", "catA": 0, "catB": 82, "catC": 0, "total": 82 },
+      { "month": "2025-12", "catA": 0, "catB": 16, "catC": 0, "total": 16 },
+      { "month": "2026-01", "catA": 0, "catB": 3, "catC": 0, "total": 3 },
+      { "month": "2026-02", "catA": 0, "catB": 6, "catC": 0, "total": 6 },
+      { "month": "2026-04", "catA": 0, "catB": 9, "catC": 0, "total": 9 },
+      { "month": "2026-05", "catA": 0, "catB": 76, "catC": 0, "total": 76 }
+    ],
+    "byResourceType": [
+      { "type": "Checker", "catA": 22, "catB": 272, "catC": 0, "total": 294 },
+      { "type": "Modeler", "catA": 3, "catB": 248, "catC": 0, "total": 251 },
+      { "type": "Detailer", "catA": 0, "catB": 482, "catC": 0, "total": 482 }
+    ]
+  }
+}

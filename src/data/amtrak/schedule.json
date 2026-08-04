@@ -1,0 +1,16 @@
+[
+  { "milestone": "BIM Model Setup", "sequence": "All", "planned": "2025-02-15", "actual": "2025-02-18", "status": "completed" },
+  { "milestone": "Seq 1-2 Modeling Complete", "sequence": "Seq 1-2", "planned": "2025-04-01", "actual": "2025-04-05", "status": "completed" },
+  { "milestone": "Seq 3-5 Modeling Complete", "sequence": "Seq 3-5", "planned": "2025-05-15", "actual": "2025-05-22", "status": "completed" },
+  { "milestone": "Seq 1-2 Approval", "sequence": "Seq 1-2", "planned": "2025-05-01", "actual": "2025-05-03", "status": "completed" },
+  { "milestone": "Seq 6-8 Modeling Complete", "sequence": "Seq 6-8", "planned": "2025-07-01", "actual": "2025-07-10", "status": "completed" },
+  { "milestone": "Seq 3-5 Fabrication Start", "sequence": "Seq 3-5", "planned": "2025-07-15", "actual": "2025-07-20", "status": "completed" },
+  { "milestone": "Seq 9-11 Modeling Complete", "sequence": "Seq 9-11", "planned": "2025-09-01", "actual": "2025-09-08", "status": "completed" },
+  { "milestone": "Canopies Design Approval", "sequence": "Canopies", "planned": "2025-09-15", "actual": null, "status": "in-progress" },
+  { "milestone": "Seq 12-14 Modeling Complete", "sequence": "Seq 12-14", "planned": "2025-10-15", "actual": null, "status": "in-progress" },
+  { "milestone": "Seq 1-2 Erection Complete", "sequence": "Seq 1-2", "planned": "2025-11-01", "actual": null, "status": "upcoming" },
+  { "milestone": "Seq 15-17 Modeling Complete", "sequence": "Seq 15-17", "planned": "2025-12-01", "actual": null, "status": "upcoming" },
+  { "milestone": "Seq 18-20 Modeling Complete", "sequence": "Seq 18-20", "planned": "2026-01-15", "actual": null, "status": "upcoming" },
+  { "milestone": "Full Fabrication Complete", "sequence": "All", "planned": "2026-03-01", "actual": null, "status": "upcoming" },
+  { "milestone": "Project Handover", "sequence": "All", "planned": "2026-05-01", "actual": null, "status": "upcoming" }
+]

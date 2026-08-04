@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "total": 132,
+    "closed": 124,
+    "open": 8
+  },
+  "bySequence": [
+    { "sequence": "ABM", "total": 43, "closed": 43, "open": 0 },
+    { "sequence": "Anchor Bolt", "total": 14, "closed": 14, "open": 0 },
+    { "sequence": "CD", "total": 4, "closed": 4, "open": 0 },
+    { "sequence": "ALL", "total": 38, "closed": 35, "open": 3 },
+    { "sequence": "Seq 1", "total": 8, "closed": 7, "open": 1 },
+    { "sequence": "Seq 3-5", "total": 6, "closed": 5, "open": 1 },
+    { "sequence": "Seq 6-8", "total": 4, "closed": 3, "open": 1 },
+    { "sequence": "Seq 9-11", "total": 7, "closed": 5, "open": 2 },
+    { "sequence": "Canopy", "total": 5, "closed": 5, "open": 0 },
+    { "sequence": "Seq 18", "total": 3, "closed": 3, "open": 0 }
+  ],
+  "monthlyTrend": [
+    { "month": "2025-05", "sent": 18, "resolved": 1 },
+    { "month": "2025-06", "sent": 30, "resolved": 42 },
+    { "month": "2025-07", "sent": 28, "resolved": 28 },
+    { "month": "2025-08", "sent": 32, "resolved": 30 },
+    { "month": "2025-09", "sent": 16, "resolved": 15 },
+    { "month": "2025-10", "sent": 5, "resolved": 5 },
+    { "month": "2025-11", "sent": 3, "resolved": 3 }
+  ]
+}
