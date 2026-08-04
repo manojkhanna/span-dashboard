@@ -196,8 +196,8 @@ export default function DataUpload() {
     <div className="min-h-screen bg-cream">
       <header className="border-b border-stone-200 bg-white/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
-          <Link to="/" className="w-8 h-8 rounded-lg bg-teal-brand flex items-center justify-center hover:bg-teal-brand/90 transition-colors">
-            <span className="text-sm font-bold text-white">S</span>
+          <Link to="/">
+            <img src="/iitd-logo.png" alt="IIT Delhi" className="h-9 w-9 object-contain" />
           </Link>
           <div>
             <div className="flex items-center gap-2">

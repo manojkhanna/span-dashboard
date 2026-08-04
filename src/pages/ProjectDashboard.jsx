@@ -50,8 +50,8 @@ export default function ProjectDashboard() {
       <header className="border-b border-stone-200 bg-white/80 backdrop-blur sticky top-0 z-50 print:static print:bg-white print:backdrop-blur-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link to="/" className="w-8 h-8 rounded-lg bg-teal-brand flex items-center justify-center hover:bg-teal-brand/90 transition-colors print:hover:bg-teal-brand">
-              <span className="text-sm font-bold text-white">S</span>
+            <Link to="/">
+              <img src="/iitd-logo.png" alt="IIT Delhi" className="h-9 w-9 object-contain" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
@@ -73,6 +73,7 @@ export default function ProjectDashboard() {
             >
               Export PDF
             </button>
+            <img src="/industry50-logo.png" alt="Industry 5.0" className="h-9 object-contain hidden sm:block" />
           </div>
         </div>
       </header>
@@ -175,10 +176,14 @@ export default function ProjectDashboard() {
           <Recommendations recommendations={recommendations} />
         </div>
 
-        <footer className="text-center py-6 border-t border-stone-200">
-          <p className="text-xs text-stone-400">
-            SPAN — Structural Process Accountability Network | Group 5 | IIT Delhi
-          </p>
+        <footer className="py-6 border-t border-stone-200">
+          <div className="flex items-center justify-center gap-6">
+            <img src="/iitd-logo.png" alt="IIT Delhi" className="h-8 w-8 object-contain" />
+            <p className="text-xs text-stone-400">
+              SPAN — Structural Process Accountability Network | Group 5 | IIT Delhi
+            </p>
+            <img src="/industry50-logo.png" alt="Industry 5.0" className="h-8 object-contain" />
+          </div>
         </footer>
       </main>
     </div>

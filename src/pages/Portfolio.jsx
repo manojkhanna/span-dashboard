@@ -20,20 +20,21 @@ export default function Portfolio() {
       <header className="border-b border-stone-200 bg-white/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-teal-brand flex items-center justify-center">
-              <span className="text-sm font-bold text-white">S</span>
-            </div>
+            <img src="/iitd-logo.png" alt="IIT Delhi" className="h-9 w-9 object-contain" />
             <div>
               <h1 className="text-base font-semibold text-stone-900 leading-tight">SPAN</h1>
               <p className="text-xs text-stone-500">Portfolio Health Overview</p>
             </div>
           </div>
-          <Link
-            to="/upload"
-            className="px-4 py-2 rounded-lg bg-teal-brand hover:bg-teal-brand/90 text-sm font-medium text-white transition-colors shadow-sm"
-          >
-            + Add Project
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/upload"
+              className="px-4 py-2 rounded-lg bg-teal-brand hover:bg-teal-brand/90 text-sm font-medium text-white transition-colors shadow-sm"
+            >
+              + Add Project
+            </Link>
+            <img src="/industry50-logo.png" alt="Industry 5.0" className="h-9 object-contain hidden sm:block" />
+          </div>
         </div>
       </header>
 
@@ -122,13 +123,19 @@ export default function Portfolio() {
           </Link>
         </div>
 
-        <footer className="text-center py-8 mt-8 border-t border-stone-200">
-          <p className="text-xs text-stone-400">
-            SPAN — Structural Process Accountability Network | Group 5 | IIT Delhi
-          </p>
-          <p className="text-xs text-stone-400 mt-1">
-            Capstone Project | Guide: Prof. Sunil Jha
-          </p>
+        <footer className="py-8 mt-8 border-t border-stone-200">
+          <div className="flex items-center justify-center gap-6 mb-3">
+            <img src="/iitd-logo.png" alt="IIT Delhi" className="h-10 w-10 object-contain" />
+            <div className="text-center">
+              <p className="text-xs text-stone-500 font-medium">
+                SPAN — Structural Process Accountability Network
+              </p>
+              <p className="text-xs text-stone-400 mt-0.5">
+                IIT Delhi | Group 5 | Capstone Project | Guide: Prof. Sunil Jha
+              </p>
+            </div>
+            <img src="/industry50-logo.png" alt="Industry 5.0" className="h-10 object-contain" />
+          </div>
         </footer>
       </main>
     </div>
