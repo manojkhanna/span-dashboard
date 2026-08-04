@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProjectData } from '../data/projects'
 import { computeOverallHealth } from '../utils/healthScore'
 import { detectRisks, generateRecommendations } from '../utils/predictions'
@@ -28,6 +28,7 @@ const dimensionLabels = {
 
 export default function ProjectDashboard() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const data = getProjectData(id)
 
   if (!data) {
@@ -68,6 +69,12 @@ export default function ProjectDashboard() {
               <p className="text-sm font-medium text-stone-800">{project.client}</p>
               <p className="text-xs text-stone-500">PM: {project.projectManager}</p>
             </div>
+            <button
+              onClick={() => navigate(`/upload?update=${id}`)}
+              className="print:hidden px-3 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-medium text-stone-600 hover:bg-stone-50 transition-colors shadow-sm"
+            >
+              Update Data
+            </button>
             <button
               onClick={() => window.print()}
               className="print:hidden px-3 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-medium text-stone-600 hover:bg-stone-50 transition-colors shadow-sm"

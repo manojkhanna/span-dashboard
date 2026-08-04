@@ -14,6 +14,7 @@ import krishnaHistory from './krishna-apra/history.json'
 import krishnaSchedule from './krishna-apra/schedule.json'
 
 const UPLOADED_KEY = 'span_uploaded_projects'
+const OVERRIDES_KEY = 'span_project_overrides'
 
 function loadUploaded() {
   try {
@@ -26,6 +27,19 @@ function loadUploaded() {
 
 function saveUploaded(projects) {
   localStorage.setItem(UPLOADED_KEY, JSON.stringify(projects))
+}
+
+function loadOverrides() {
+  try {
+    const raw = localStorage.getItem(OVERRIDES_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveOverrides(overrides) {
+  localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides))
 }
 
 const builtInProjects = {
@@ -62,7 +76,11 @@ export function getAllProjects() {
 }
 
 export function getProjectData(id) {
-  if (builtInProjects[id]) return builtInProjects[id]
+  if (builtInProjects[id]) {
+    const overrides = loadOverrides()
+    if (overrides[id]) return { ...builtInProjects[id], ...overrides[id] }
+    return builtInProjects[id]
+  }
   const uploaded = loadUploaded()
   const found = uploaded.find(p => p.id === id)
   return found ? found.data : null
@@ -72,6 +90,21 @@ export function addUploadedProject(id, data) {
   const uploaded = loadUploaded()
   uploaded.push({ id, data })
   saveUploaded(uploaded)
+}
+
+export function updateProjectData(id, partialData) {
+  if (builtInProjects[id]) {
+    const overrides = loadOverrides()
+    overrides[id] = { ...overrides[id], ...partialData }
+    saveOverrides(overrides)
+  } else {
+    const uploaded = loadUploaded()
+    const idx = uploaded.findIndex(p => p.id === id)
+    if (idx >= 0) {
+      uploaded[idx].data = { ...uploaded[idx].data, ...partialData }
+      saveUploaded(uploaded)
+    }
+  }
 }
 
 export function removeUploadedProject(id) {

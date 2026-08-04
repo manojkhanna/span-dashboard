@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState, useCallback, useEffect } from 'react'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import * as XLSX from 'xlsx'
-import { addUploadedProject } from '../data/projects'
+import { addUploadedProject, updateProjectData, getProjectData } from '../data/projects'
 
 const REQUIRED_SHEETS = ['Progress', 'Errors', 'RFI']
 
@@ -98,22 +98,66 @@ function parseRfi(ws) {
 
 export default function DataUpload() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const updateId = searchParams.get('update')
+
   const [step, setStep] = useState(1)
   const [projectMeta, setProjectMeta] = useState({
     name: '', client: '', projectManager: '', teamLeader: '', domain: 'bim',
   })
   const [file, setFile] = useState(null)
+  const [fileType, setFileType] = useState(null)
   const [sheets, setSheets] = useState([])
   const [mapping, setMapping] = useState({ progress: '', errors: '', rfi: '' })
   const [preview, setPreview] = useState(null)
+  const [ifcPreview, setIfcPreview] = useState(null)
   const [error, setError] = useState(null)
+  const [parsing, setParsing] = useState(false)
 
-  const handleFile = useCallback((e) => {
+  useEffect(() => {
+    if (updateId) {
+      const existing = getProjectData(updateId)
+      if (existing?.project) {
+        setProjectMeta({
+          name: existing.project.name || '',
+          client: existing.project.client || '',
+          projectManager: existing.project.projectManager || '',
+          teamLeader: existing.project.teamLeader || '',
+          domain: existing.project.domain || 'bim',
+        })
+      }
+    }
+  }, [updateId])
+
+  const handleFile = useCallback(async (e) => {
     const f = e.target.files[0]
     if (!f) return
     setFile(f)
     setError(null)
+    setIfcPreview(null)
+    setPreview(null)
 
+    const ext = f.name.split('.').pop().toLowerCase()
+
+    if (ext === 'ifc') {
+      setFileType('ifc')
+      setParsing(true)
+      try {
+        const { parseIfcFile } = await import('../utils/ifcParser.js')
+        const buffer = await f.arrayBuffer()
+        const ifcData = await parseIfcFile(buffer)
+        ifcData.source = f.name
+        setIfcPreview(ifcData)
+        setStep(3)
+      } catch (err) {
+        setError(`IFC parsing failed: ${err.message}`)
+      } finally {
+        setParsing(false)
+      }
+      return
+    }
+
+    setFileType('excel')
     const reader = new FileReader()
     reader.onload = (ev) => {
       try {
@@ -166,8 +210,30 @@ export default function DataUpload() {
   }, [file, mapping])
 
   const handleSubmit = useCallback(() => {
-    if (!projectMeta.name.trim()) {
+    if (!updateId && !projectMeta.name.trim()) {
       setError('Please enter a project name.')
+      return
+    }
+
+    if (updateId) {
+      const partial = {}
+      if (fileType === 'ifc' && ifcPreview) {
+        partial.ifc = ifcPreview
+      } else if (preview) {
+        partial.progress = preview.progress
+        partial.errors = preview.errors
+        partial.rfi = preview.rfi
+        partial.project = {
+          ...projectMeta,
+          totalWeight: preview.progress.reduce((s, p) => s + (p.weight || 0), 0),
+          totalArea: preview.progress.reduce((s, p) => s + (p.area || 0), 0),
+          changeOrders: { submitted: 0, approved: 0, rejected: 0 },
+          rfiSummary: preview.rfi.summary,
+          manCount: [{ week: new Date().toISOString().slice(0, 10), count: 10 }],
+        }
+      }
+      updateProjectData(updateId, partial)
+      navigate(`/project/${updateId}`)
       return
     }
 
@@ -177,20 +243,28 @@ export default function DataUpload() {
     const projectData = {
       project: {
         ...projectMeta,
-        totalWeight: preview.progress.reduce((s, p) => s + (p.weight || 0), 0),
-        totalArea: preview.progress.reduce((s, p) => s + (p.area || 0), 0),
+        totalWeight: (preview?.progress || []).reduce((s, p) => s + (p.weight || 0), 0),
+        totalArea: (preview?.progress || []).reduce((s, p) => s + (p.area || 0), 0),
         changeOrders: { submitted: 0, approved: 0, rejected: 0 },
-        rfiSummary: preview.rfi.summary,
+        rfiSummary: preview?.rfi?.summary || { total: 0, closed: 0, open: 0 },
         manCount,
       },
-      progress: preview.progress,
-      errors: preview.errors,
-      rfi: preview.rfi,
+      progress: preview?.progress || [],
+      errors: preview?.errors || { external: [], internal: { byMonth: [], byResourceType: [] } },
+      rfi: preview?.rfi || { summary: { total: 0, closed: 0, open: 0 }, bySequence: [], monthlyTrend: [] },
+    }
+
+    if (ifcPreview) {
+      projectData.ifc = ifcPreview
     }
 
     addUploadedProject(id, projectData)
-    navigate('/')
-  }, [projectMeta, preview, navigate])
+    navigate(`/project/${id}`)
+  }, [projectMeta, preview, ifcPreview, fileType, navigate, updateId])
+
+  const stepLabels = fileType === 'ifc'
+    ? ['Upload', '—', 'Review & Save']
+    : ['Upload', 'Map Sheets', 'Review & Save']
 
   return (
     <div className="min-h-screen bg-cream">
@@ -203,9 +277,19 @@ export default function DataUpload() {
             <div className="flex items-center gap-2">
               <Link to="/" className="text-xs text-stone-400 hover:text-teal-brand transition-colors">Portfolio</Link>
               <span className="text-xs text-stone-300">/</span>
-              <h1 className="text-base font-semibold text-stone-900">Add Project</h1>
+              {updateId && (
+                <>
+                  <Link to={`/project/${updateId}`} className="text-xs text-stone-400 hover:text-teal-brand transition-colors">{projectMeta.name || updateId}</Link>
+                  <span className="text-xs text-stone-300">/</span>
+                </>
+              )}
+              <h1 className="text-base font-semibold text-stone-900">
+                {updateId ? 'Update Data' : 'Add Project'}
+              </h1>
             </div>
-            <p className="text-xs text-stone-500">Upload project data from Excel or CSV</p>
+            <p className="text-xs text-stone-500">
+              {updateId ? 'Replace or add data for this project' : 'Upload project data from Excel, CSV, or IFC'}
+            </p>
           </div>
         </div>
       </header>
@@ -220,7 +304,7 @@ export default function DataUpload() {
                 {s}
               </div>
               <span className={`text-xs ${step >= s ? 'text-stone-800' : 'text-stone-400'}`}>
-                {s === 1 ? 'Upload' : s === 2 ? 'Map Sheets' : 'Review & Save'}
+                {stepLabels[s - 1]}
               </span>
               {s < 3 && <div className={`w-12 h-0.5 ${step > s ? 'bg-teal-brand' : 'bg-stone-200'}`} />}
             </div>
@@ -235,109 +319,125 @@ export default function DataUpload() {
 
         {step === 1 && (
           <div className="space-y-6">
-            <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-semibold text-stone-800 mb-4">Project Details</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-stone-500 mb-1 block">Project Name *</label>
-                  <input
-                    type="text"
-                    value={projectMeta.name}
-                    onChange={e => setProjectMeta(p => ({ ...p, name: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
-                    placeholder="e.g., Tower Construction Phase 2"
-                  />
+            {!updateId && (
+              <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold text-stone-800 mb-4">Project Details</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-stone-500 mb-1 block">Project Name *</label>
+                    <input
+                      type="text"
+                      value={projectMeta.name}
+                      onChange={e => setProjectMeta(p => ({ ...p, name: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
+                      placeholder="e.g., Tower Construction Phase 2"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-stone-500 mb-1 block">Client</label>
+                    <input
+                      type="text"
+                      value={projectMeta.client}
+                      onChange={e => setProjectMeta(p => ({ ...p, client: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
+                      placeholder="e.g., ABC Construction Ltd."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-stone-500 mb-1 block">Project Manager</label>
+                    <input
+                      type="text"
+                      value={projectMeta.projectManager}
+                      onChange={e => setProjectMeta(p => ({ ...p, projectManager: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-stone-500 mb-1 block">Team Leader</label>
+                    <input
+                      type="text"
+                      value={projectMeta.teamLeader}
+                      onChange={e => setProjectMeta(p => ({ ...p, teamLeader: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-xs text-stone-500 mb-1 block">Client</label>
-                  <input
-                    type="text"
-                    value={projectMeta.client}
-                    onChange={e => setProjectMeta(p => ({ ...p, client: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
-                    placeholder="e.g., ABC Construction Ltd."
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-stone-500 mb-1 block">Project Manager</label>
-                  <input
-                    type="text"
-                    value={projectMeta.projectManager}
-                    onChange={e => setProjectMeta(p => ({ ...p, projectManager: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-stone-500 mb-1 block">Team Leader</label>
-                  <input
-                    type="text"
-                    value={projectMeta.teamLeader}
-                    onChange={e => setProjectMeta(p => ({ ...p, teamLeader: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-800 focus:border-teal-brand focus:outline-none"
-                  />
+                <div className="mt-4">
+                  <label className="text-xs text-stone-500 mb-2 block">Domain</label>
+                  <div className="flex gap-3">
+                    {[{ value: 'bim', label: 'BIM / Structural Engineering' }, { value: 'repair', label: 'Repair & Retrofit' }].map(d => (
+                      <button
+                        key={d.value}
+                        onClick={() => setProjectMeta(p => ({ ...p, domain: d.value }))}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          projectMeta.domain === d.value
+                            ? 'bg-teal-brand text-white shadow-sm'
+                            : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                        }`}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="mt-4">
-                <label className="text-xs text-stone-500 mb-2 block">Domain</label>
-                <div className="flex gap-3">
-                  {[{ value: 'bim', label: 'BIM / Structural Engineering' }, { value: 'repair', label: 'Repair & Retrofit' }].map(d => (
-                    <button
-                      key={d.value}
-                      onClick={() => setProjectMeta(p => ({ ...p, domain: d.value }))}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        projectMeta.domain === d.value
-                          ? 'bg-teal-brand text-white shadow-sm'
-                          : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                      }`}
-                    >
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
+            )}
+
+            {updateId && (
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-blue-800 mb-1">Updating: {projectMeta.name || updateId}</h3>
+                <p className="text-xs text-blue-600">
+                  Upload an Excel/CSV file to replace project data, or an IFC file to add/replace the BIM model summary.
+                </p>
               </div>
-            </div>
+            )}
 
             <div className="rounded-xl border-2 border-dashed border-stone-300 bg-white p-8 text-center hover:border-teal-brand/50 transition-colors">
               <input
                 type="file"
-                accept=".xlsx,.xls,.csv"
+                accept=".xlsx,.xls,.csv,.ifc"
                 onChange={handleFile}
                 className="hidden"
                 id="file-upload"
               />
               <label htmlFor="file-upload" className="cursor-pointer">
                 <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-4">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" strokeWidth="2" strokeLinecap="round">
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-                  </svg>
+                  {parsing ? (
+                    <div className="w-7 h-7 border-3 border-teal-brand/30 border-t-teal-brand rounded-full animate-spin" />
+                  ) : (
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" strokeWidth="2" strokeLinecap="round">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                    </svg>
+                  )}
                 </div>
                 <p className="text-sm font-medium text-stone-700 mb-1">
-                  {file ? file.name : 'Click to upload Excel or CSV'}
+                  {parsing ? 'Parsing IFC model...' : file ? file.name : 'Click to upload Excel, CSV, or IFC file'}
                 </p>
                 <p className="text-xs text-stone-400">
-                  File should contain sheets for Progress, Errors, and RFI data
+                  {parsing
+                    ? 'Extracting structural elements, weights, and zones from BIM model'
+                    : 'Excel/CSV for project data — IFC for BIM model summary'}
                 </p>
               </label>
             </div>
 
             <div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
-              <h4 className="text-xs font-semibold text-stone-700 mb-3">Expected Data Format</h4>
+              <h4 className="text-xs font-semibold text-stone-700 mb-3">Supported Formats</h4>
               <div className="space-y-3 text-xs text-stone-500">
                 <div>
-                  <span className="text-stone-700 font-medium">Progress sheet:</span> Sequence, Weight/Area, Contribution, Progress, Phase, Approval %, Fab %
+                  <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-medium mr-2">Excel/CSV</span>
+                  Progress, Errors, and RFI sheets with sequence data, error categories, and RFI status tracking
                 </div>
                 <div>
-                  <span className="text-stone-700 font-medium">Errors sheet:</span> Month, Category (A/B/C), Type, Count, Source (Internal/External)
-                </div>
-                <div>
-                  <span className="text-stone-700 font-medium">RFI sheet:</span> Sequence, Status (Open/Closed), Month/Date Sent
+                  <span className="inline-block px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-medium mr-2">IFC</span>
+                  BIM model file — automatically extracts element counts, weights, zones, and member types
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {step === 2 && (
+        {step === 2 && fileType === 'excel' && (
           <div className="space-y-6">
             <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
               <h3 className="text-sm font-semibold text-stone-800 mb-1">Map Sheets</h3>
@@ -375,7 +475,72 @@ export default function DataUpload() {
           </div>
         )}
 
-        {step === 3 && preview && (
+        {step === 3 && fileType === 'ifc' && ifcPreview && (
+          <div className="space-y-6">
+            <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-stone-800">IFC Model Preview</h3>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 font-medium">IFC Data</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div className="rounded-lg bg-blue-50 p-3 text-center">
+                  <div className="text-xl font-bold text-blue-700">{ifcPreview.totalElements.toLocaleString()}</div>
+                  <div className="text-xs text-stone-500">Elements</div>
+                </div>
+                <div className="rounded-lg bg-teal-50 p-3 text-center">
+                  <div className="text-xl font-bold text-teal-700">{ifcPreview.totalWeightTons.toLocaleString()}</div>
+                  <div className="text-xs text-stone-500">Weight (tons)</div>
+                </div>
+                <div className="rounded-lg bg-purple-50 p-3 text-center">
+                  <div className="text-xl font-bold text-purple-700">{Object.keys(ifcPreview.zones).length}</div>
+                  <div className="text-xs text-stone-500">Zones</div>
+                </div>
+                <div className="rounded-lg bg-amber-50 p-3 text-center">
+                  <div className="text-xl font-bold text-amber-700">{Object.keys(ifcPreview.memberTypes).length}</div>
+                  <div className="text-xs text-stone-500">Member Types</div>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-xs text-stone-500">
+                {ifcPreview.software && <div>Software: <span className="text-stone-700 font-medium">{ifcPreview.software}</span></div>}
+                {ifcPreview.schema && <div>Schema: <span className="text-stone-700 font-medium">{ifcPreview.schema}</span></div>}
+              </div>
+
+              <div className="mt-3">
+                <h4 className="text-xs text-stone-500 mb-2">Element types:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(ifcPreview.elementTypes).map(([type, count]) => (
+                    <span key={type} className="text-xs px-2 py-1 rounded bg-stone-100 text-stone-700">
+                      {type}: {count.toLocaleString()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <h4 className="text-xs text-stone-500 mb-2">Zones:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(ifcPreview.zones).map(([zone, z]) => (
+                    <span key={zone} className="text-xs px-2 py-1 rounded bg-teal-50 text-teal-700">
+                      {zone}: {z.elements} el / {z.weight_tons}t
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button onClick={() => { setStep(1); setIfcPreview(null); setFile(null); setFileType(null) }} className="px-4 py-2 rounded-lg bg-stone-100 text-sm text-stone-600 hover:bg-stone-200 transition-colors">
+                Back
+              </button>
+              <button onClick={handleSubmit} className="px-6 py-2 rounded-lg bg-teal-brand text-sm font-medium text-white hover:bg-teal-brand/90 transition-colors shadow-sm">
+                {updateId ? 'Update BIM Data' : 'Save & View Dashboard'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && fileType === 'excel' && preview && (
           <div className="space-y-6">
             <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
               <h3 className="text-sm font-semibold text-stone-800 mb-4">Data Preview</h3>
@@ -408,21 +573,23 @@ export default function DataUpload() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-semibold text-stone-800 mb-3">Confirm Project</h3>
-              <div className="space-y-2 text-sm text-stone-500">
-                <div>Name: <span className="text-stone-800 font-medium">{projectMeta.name || '(not set)'}</span></div>
-                <div>Client: <span className="text-stone-800 font-medium">{projectMeta.client || '(not set)'}</span></div>
-                <div>Domain: <span className="text-stone-800 font-medium">{projectMeta.domain === 'repair' ? 'Repair & Retrofit' : 'BIM / Structural'}</span></div>
+            {!updateId && (
+              <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
+                <h3 className="text-sm font-semibold text-stone-800 mb-3">Confirm Project</h3>
+                <div className="space-y-2 text-sm text-stone-500">
+                  <div>Name: <span className="text-stone-800 font-medium">{projectMeta.name || '(not set)'}</span></div>
+                  <div>Client: <span className="text-stone-800 font-medium">{projectMeta.client || '(not set)'}</span></div>
+                  <div>Domain: <span className="text-stone-800 font-medium">{projectMeta.domain === 'repair' ? 'Repair & Retrofit' : 'BIM / Structural'}</span></div>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex gap-3">
               <button onClick={() => setStep(2)} className="px-4 py-2 rounded-lg bg-stone-100 text-sm text-stone-600 hover:bg-stone-200 transition-colors">
                 Back
               </button>
               <button onClick={handleSubmit} className="px-6 py-2 rounded-lg bg-teal-brand text-sm font-medium text-white hover:bg-teal-brand/90 transition-colors shadow-sm">
-                Save & View Dashboard
+                {updateId ? 'Update Project Data' : 'Save & View Dashboard'}
               </button>
             </div>
           </div>
