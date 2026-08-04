@@ -4,6 +4,7 @@ import amtrakErrors from './amtrak/errors.json'
 import amtrakRfi from './amtrak/rfi.json'
 import amtrakHistory from './amtrak/history.json'
 import amtrakSchedule from './amtrak/schedule.json'
+import amtrakIfc from './amtrak/ifc-summary.json'
 
 import krishnaProject from './krishna-apra/project.json'
 import krishnaProgress from './krishna-apra/progress.json'
@@ -35,6 +36,7 @@ const builtInProjects = {
     rfi: amtrakRfi,
     history: amtrakHistory,
     schedule: amtrakSchedule,
+    ifc: amtrakIfc,
   },
   'krishna-apra': {
     project: krishnaProject,

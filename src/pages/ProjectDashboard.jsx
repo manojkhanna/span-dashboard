@@ -16,6 +16,7 @@ import ResourceCard from '../components/ResourceCard'
 import WeightBreakdown from '../components/WeightBreakdown'
 import RfiBySequence from '../components/RfiBySequence'
 import ExternalErrors from '../components/ExternalErrors'
+import IfcModelSummary from '../components/IfcModelSummary'
 
 const dimensionLabels = {
   progress: 'Progress',
@@ -40,7 +41,7 @@ export default function ProjectDashboard() {
     )
   }
 
-  const { project, progress, errors, rfi, history, schedule } = data
+  const { project, progress, errors, rfi, history, schedule, ifc } = data
   const { overall, scores, weights } = computeOverallHealth(data)
   const risks = detectRisks(history, scores)
   const recommendations = generateRecommendations({ scores, risks, rfi, errors, project, progress, schedule })
@@ -150,10 +151,18 @@ export default function ProjectDashboard() {
           <ScheduleVariance schedule={schedule} />
         </div>
 
-        {/* Row 3: Forecast + Weight/Area breakdown */}
+        {/* Row 3: IFC Model Summary (if available) */}
+        {ifc && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <IfcModelSummary data={ifc} />
+            <WeightBreakdown data={progress} project={project} />
+          </div>
+        )}
+
+        {/* Row 4: Forecast */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ForecastChart progress={progress} history={history} />
-          <WeightBreakdown data={progress} project={project} />
+          {!ifc && <WeightBreakdown data={progress} project={project} />}
         </div>
 
         {/* Row 4: Progress + Errors */}
