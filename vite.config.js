@@ -12,6 +12,7 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'iitd-logo.png', 'industry50-logo.png'],
       manifest: false,
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         runtimeCaching: [
           {
