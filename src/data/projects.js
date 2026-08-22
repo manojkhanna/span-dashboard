@@ -13,6 +13,13 @@ import krishnaRfi from './krishna-apra/rfi.json'
 import krishnaHistory from './krishna-apra/history.json'
 import krishnaSchedule from './krishna-apra/schedule.json'
 
+import westValleyProject from './west-valley/project.json'
+import westValleyProgress from './west-valley/progress.json'
+import westValleyErrors from './west-valley/errors.json'
+import westValleyRfi from './west-valley/rfi.json'
+import westValleyHistory from './west-valley/history.json'
+import westValleySchedule from './west-valley/schedule.json'
+
 const UPLOADED_KEY = 'span_uploaded_projects'
 const OVERRIDES_KEY = 'span_project_overrides'
 
@@ -59,6 +66,14 @@ const builtInProjects = {
     rfi: krishnaRfi,
     history: krishnaHistory,
     schedule: krishnaSchedule,
+  },
+  'west-valley': {
+    project: westValleyProject,
+    progress: westValleyProgress,
+    errors: westValleyErrors,
+    rfi: westValleyRfi,
+    history: westValleyHistory,
+    schedule: westValleySchedule,
   },
 }
 

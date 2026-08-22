@@ -1,0 +1,14 @@
+{
+  "external": [
+    {
+      "month": "",
+      "type": "None",
+      "category": "C",
+      "count": 0
+    }
+  ],
+  "internal": {
+    "byMonth": [],
+    "byResourceType": []
+  }
+}

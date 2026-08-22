@@ -1,0 +1,83 @@
+[
+  {
+    "month": "2025-10",
+    "overall": 25,
+    "progress": 20,
+    "quality": 80,
+    "rfi": 30,
+    "changeOrder": 0,
+    "resource": 50
+  },
+  {
+    "month": "2025-11",
+    "overall": 32,
+    "progress": 28,
+    "quality": 78,
+    "rfi": 35,
+    "changeOrder": 0,
+    "resource": 55
+  },
+  {
+    "month": "2025-12",
+    "overall": 40,
+    "progress": 38,
+    "quality": 82,
+    "rfi": 40,
+    "changeOrder": 0,
+    "resource": 58
+  },
+  {
+    "month": "2026-01",
+    "overall": 45,
+    "progress": 45,
+    "quality": 85,
+    "rfi": 42,
+    "changeOrder": 0,
+    "resource": 55
+  },
+  {
+    "month": "2026-02",
+    "overall": 50,
+    "progress": 52,
+    "quality": 88,
+    "rfi": 48,
+    "changeOrder": 0,
+    "resource": 50
+  },
+  {
+    "month": "2026-03",
+    "overall": 54,
+    "progress": 58,
+    "quality": 90,
+    "rfi": 50,
+    "changeOrder": 0,
+    "resource": 48
+  },
+  {
+    "month": "2026-04",
+    "overall": 56,
+    "progress": 62,
+    "quality": 92,
+    "rfi": 52,
+    "changeOrder": 0,
+    "resource": 45
+  },
+  {
+    "month": "2026-05",
+    "overall": 58,
+    "progress": 68,
+    "quality": 93,
+    "rfi": 55,
+    "changeOrder": 0,
+    "resource": 42
+  },
+  {
+    "month": "2026-06",
+    "overall": 59,
+    "progress": 72,
+    "quality": 95,
+    "rfi": 55,
+    "changeOrder": 0,
+    "resource": 38
+  }
+]

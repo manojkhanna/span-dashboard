@@ -1,0 +1,86 @@
+[
+  {
+    "milestone": "ABM Complete",
+    "sequence": "ABM",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Anchor Bolts Complete",
+    "sequence": "Anchor Bolts",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "MOB Tier-1 Complete",
+    "sequence": "MOB Tier-1",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Tower Tier-1 Complete",
+    "sequence": "Tower Tier-1",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "in-progress"
+  },
+  {
+    "milestone": "MOB Tier-2 Complete",
+    "sequence": "MOB Tier-2",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "MOB Tier-3 Complete",
+    "sequence": "MOB Tier-3",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Hospital Tier-1 Complete",
+    "sequence": "Hospital Tier-1",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Tower Tier-2 Complete",
+    "sequence": "Tower Tier-2",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Hospital Tier-2 Complete",
+    "sequence": "Hospital Tier-2",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Tower Tier-3 Complete",
+    "sequence": "Tower Tier-3",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Helipad, Screen Wall Complete",
+    "sequence": "Helipad, Screen Wall",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  },
+  {
+    "milestone": "Elevator steel Complete",
+    "sequence": "Elevator steel",
+    "planned": "2026-12-01",
+    "actual": null,
+    "status": "upcoming"
+  }
+]
