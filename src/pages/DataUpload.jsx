@@ -365,7 +365,10 @@ export default function DataUpload() {
       errors: preview?.errors || { external: [], internal: { byMonth: [], byResourceType: [] } },
       rfi: preview?.rfi || { summary: { total: 0, closed: 0, open: 0 }, bySequence: [], monthlyTrend: [] },
       history: [{ month: new Date().toISOString().slice(0, 7), overall: 50, progress: 50, quality: 75, rfi: 50, changeOrder: 80, resource: 60 }],
-      schedule: (preview?.progress || []).map(p => ({ sequence: p.sequence, planned: 100, actual: p.totalProgress || p.overallProgress || 0 })),
+      schedule: (preview?.progress || []).map(p => {
+        const prog = p.totalProgress || p.overallProgress || 0
+        return { milestone: `${p.sequence} Complete`, sequence: p.sequence, planned: '2026-12-01', actual: prog >= 100 ? '2026-12-01' : null, status: prog >= 100 ? 'completed' : prog > 0 ? 'in-progress' : 'upcoming' }
+      }),
     }
 
     if (ifcPreview) projectData.ifc = ifcPreview

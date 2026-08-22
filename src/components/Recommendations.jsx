@@ -35,7 +35,7 @@ export default function Recommendations({ recommendations }) {
       </div>
       <div className="space-y-3">
         {recommendations.map((rec, i) => {
-          const style = priorityStyles[rec.priority]
+          const style = priorityStyles[rec.priority] || priorityStyles['low']
           return (
             <div key={i} className={`rounded-lg border p-4 ${style.bg} ${style.border}`}>
               <div className="flex items-start gap-3">

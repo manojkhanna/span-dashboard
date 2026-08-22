@@ -70,7 +70,7 @@ export default function ScheduleVariance({ schedule }) {
 
       <div className="space-y-1.5 max-h-[280px] overflow-y-auto">
         {schedule.map((m, i) => {
-          const style = statusStyles[m.status]
+          const style = statusStyles[m.status] || statusStyles['upcoming']
           const variance = daysDiff(m.planned, m.actual)
           return (
             <div key={i} className={`flex items-center gap-3 rounded-lg p-2 ${style.bg}`}>

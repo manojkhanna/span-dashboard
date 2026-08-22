@@ -65,7 +65,7 @@ export default function RiskFlags({ risks }) {
       </div>
       <div className="space-y-3">
         {risks.map((risk, i) => {
-          const style = severityStyles[risk.severity]
+          const style = severityStyles[risk.severity] || severityStyles['info']
           return (
             <div key={i} className={`rounded-lg border p-3 ${style.bg} ${style.border}`}>
               <div className="flex items-start gap-3">

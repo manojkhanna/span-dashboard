@@ -24,7 +24,7 @@ export default function ExternalErrors({ data }) {
       </div>
       <div className="space-y-2">
         {Object.entries(grouped).sort().map(([cat, count]) => {
-          const style = categoryColors[cat]
+          const style = categoryColors[cat] || categoryColors['C']
           return (
             <div key={cat} className={`flex items-center justify-between rounded-lg border p-3 ${style.bg} ${style.border}`}>
               <div>
