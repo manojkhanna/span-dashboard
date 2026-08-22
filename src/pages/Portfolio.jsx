@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { getAllProjects, getProjectData } from '../data/projects'
 import { computeOverallHealth, getHealthStatus } from '../utils/healthScore'
+import { useAuth } from '../contexts/AuthContext'
+import RoleSelector from '../components/RoleSelector'
 import HealthGauge from '../components/HealthGauge'
 
 const domainLabels = {
@@ -13,6 +15,7 @@ function getDomain(project) {
 }
 
 export default function Portfolio() {
+  const { hasPermission } = useAuth()
   const projects = getAllProjects()
 
   return (
@@ -26,13 +29,24 @@ export default function Portfolio() {
               <p className="text-xs text-stone-500">Portfolio Health Overview</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/upload"
-              className="px-4 py-2 rounded-lg bg-teal-brand hover:bg-teal-brand/90 text-sm font-medium text-white transition-colors shadow-sm"
-            >
-              + Add Project
-            </Link>
+          <div className="flex items-center gap-3">
+            {hasPermission('integrations') && (
+              <Link
+                to="/integrations"
+                className="px-4 py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-sm font-medium text-stone-600 transition-colors"
+              >
+                Integrations
+              </Link>
+            )}
+            {hasPermission('upload') && (
+              <Link
+                to="/upload"
+                className="px-4 py-2 rounded-lg bg-teal-brand hover:bg-teal-brand/90 text-sm font-medium text-white transition-colors shadow-sm"
+              >
+                + Add Project
+              </Link>
+            )}
+            <RoleSelector />
             <img src="/industry50-logo.png" alt="Industry 5.0" className="h-9 object-contain hidden sm:block" />
           </div>
         </div>

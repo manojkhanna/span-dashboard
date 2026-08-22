@@ -22,6 +22,39 @@ function linearTrend(points) {
   return { slope, intercept: meanY - slope * meanX }
 }
 
+function stddev(values) {
+  const n = values.length
+  if (n < 2) return 0
+  const mean = values.reduce((a, b) => a + b, 0) / n
+  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (n - 1)
+  return Math.sqrt(variance)
+}
+
+function holtSmooth(values, alpha = 0.3, beta = 0.1) {
+  if (!values || values.length === 0) {
+    return { level: 0, trend: 0, forecast: () => 0 }
+  }
+  if (values.length === 1) {
+    return { level: values[0], trend: 0, forecast: () => values[0] }
+  }
+
+  let level = values[0]
+  let trend = values[1] - values[0]
+
+  for (let i = 1; i < values.length; i++) {
+    const newLevel = alpha * values[i] + (1 - alpha) * (level + trend)
+    const newTrend = beta * (newLevel - level) + (1 - beta) * trend
+    level = newLevel
+    trend = newTrend
+  }
+
+  return {
+    level,
+    trend,
+    forecast: (steps) => level + trend * steps,
+  }
+}
+
 export function forecastHealth(history, monthsAhead = 3) {
   if (!history || history.length < 2) return []
 
@@ -34,13 +67,17 @@ export function forecastHealth(history, monthsAhead = 3) {
     const futureMonth = month + m
     const fYear = year + Math.floor((futureMonth - 1) / 12)
     const fMonth = ((futureMonth - 1) % 12) + 1
-    const entry = { month: `${fYear}-${String(fMonth).padStart(2, '0')}`, forecast: true }
+    const entry = { month: `${fYear}-${String(fMonth).padStart(2, '0')}`, forecast: true, method: 'holt' }
 
     dims.forEach(dim => {
       const values = history.map(h => h[dim])
-      const { slope, intercept } = linearTrend(values)
-      const projected = Math.round(intercept + slope * (history.length - 1 + m))
+      const smooth = holtSmooth(values)
+      const projected = Math.round(smooth.forecast(m))
+      const sd = stddev(values)
+      const band = sd * Math.sqrt(m)
       entry[dim] = Math.max(0, Math.min(100, projected))
+      entry[`${dim}_upper`] = Math.max(0, Math.min(100, Math.round(projected + band)))
+      entry[`${dim}_lower`] = Math.max(0, Math.min(100, Math.round(projected - band)))
     })
 
     forecasts.push(entry)
@@ -228,8 +265,8 @@ export function generateRecommendations(data) {
 export function computeSequenceForecasts(progress, history) {
   if (!progress || !history || history.length < 2) return []
 
-  const progressTrend = linearTrend(history.map(h => h.progress))
-  const monthlyGain = Math.max(progressTrend.slope, 0.5)
+  const progressSmooth = holtSmooth(history.map(h => h.progress))
+  const monthlyGain = Math.max(progressSmooth.trend, 0.5)
 
   return progress.map(seq => {
     const current = seq.totalProgress || seq.overallProgress || 0

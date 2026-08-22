@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProjectData } from '../data/projects'
 import { computeOverallHealth } from '../utils/healthScore'
 import { detectRisks, generateRecommendations } from '../utils/predictions'
+import { useAuth } from '../contexts/AuthContext'
+import RoleSelector from '../components/RoleSelector'
 import HealthGauge from '../components/HealthGauge'
 import HealthTrend from '../components/HealthTrend'
 import RiskFlags from '../components/RiskFlags'
@@ -30,6 +33,8 @@ const dimensionLabels = {
 export default function ProjectDashboard() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { hasPermission } = useAuth()
+  const [generatingReport, setGeneratingReport] = useState(false)
   const data = getProjectData(id)
 
   if (!data) {
@@ -65,23 +70,45 @@ export default function ProjectDashboard() {
               <p className="text-xs text-stone-500">Predictive Project Health Dashboard</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-stone-800">{project.client}</p>
               <p className="text-xs text-stone-500">PM: {project.projectManager}</p>
             </div>
-            <button
-              onClick={() => navigate(`/upload?update=${id}`)}
-              className="print:hidden px-3 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-medium text-stone-600 hover:bg-stone-50 transition-colors shadow-sm"
-            >
-              Update Data
-            </button>
+            {hasPermission('edit') && (
+              <button
+                onClick={() => navigate(`/upload?update=${id}`)}
+                className="print:hidden px-3 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-medium text-stone-600 hover:bg-stone-50 transition-colors shadow-sm"
+              >
+                Update Data
+              </button>
+            )}
+            {hasPermission('export') && (
+              <button
+                onClick={async () => {
+                  setGeneratingReport(true)
+                  try {
+                    const { generateProjectReport } = await import('../utils/reportGenerator.js')
+                    await generateProjectReport({ project, progress, errors, rfi, history, schedule, ifc, scores, overall, risks, recommendations })
+                  } catch (err) {
+                    console.error('Report generation failed:', err)
+                  } finally {
+                    setGeneratingReport(false)
+                  }
+                }}
+                disabled={generatingReport}
+                className="print:hidden px-3 py-1.5 rounded-lg bg-teal-brand text-xs font-medium text-white hover:bg-teal-brand/90 transition-colors shadow-sm disabled:opacity-50"
+              >
+                {generatingReport ? 'Generating...' : 'Generate Report'}
+              </button>
+            )}
             <button
               onClick={() => window.print()}
               className="print:hidden px-3 py-1.5 rounded-lg border border-stone-200 bg-white text-xs font-medium text-stone-600 hover:bg-stone-50 transition-colors shadow-sm"
             >
               Export PDF
             </button>
+            <RoleSelector />
             <img src="/industry50-logo.png" alt="Industry 5.0" className="h-9 object-contain hidden sm:block" />
           </div>
         </div>
@@ -191,10 +218,12 @@ export default function ProjectDashboard() {
           </div>
         </div>
 
-        {/* Row 6: AI Recommendations */}
-        <div className="print:break-before-page">
-          <Recommendations recommendations={recommendations} />
-        </div>
+        {/* Row 6: AI Recommendations (PM+ only) */}
+        {hasPermission('recommendations') && (
+          <div className="print:break-before-page">
+            <Recommendations recommendations={recommendations} />
+          </div>
+        )}
 
         <footer className="py-6 border-t border-stone-200">
           <div className="flex items-center justify-center gap-6">
