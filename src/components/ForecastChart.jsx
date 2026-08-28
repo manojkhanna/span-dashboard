@@ -17,6 +17,22 @@ function CustomTooltip({ active, payload }) {
   )
 }
 
+function computeThresholds(forecasts) {
+  const months = forecasts.map(f => f.monthsToComplete).filter(m => m > 0)
+  if (months.length === 0) return { green: 3, amber: 6 }
+
+  const minM = Math.min(...months)
+  if (minM <= 6) return { green: 3, amber: 6 }
+
+  const sorted = [...new Set(months)].sort((a, b) => a - b)
+  if (sorted.length >= 3) {
+    const third = Math.ceil(sorted.length / 3)
+    return { green: sorted[third - 1], amber: sorted[2 * third - 1] }
+  }
+  if (sorted.length === 2) return { green: sorted[0], amber: sorted[1] }
+  return { green: sorted[0], amber: sorted[0] }
+}
+
 export default function ForecastChart({ progress, history }) {
   const forecasts = computeSequenceForecasts(progress, history)
 
@@ -30,6 +46,9 @@ export default function ForecastChart({ progress, history }) {
   }
 
   const maxMonths = Math.max(...forecasts.map(f => f.monthsToComplete))
+  const { green: greenMax, amber: amberMax } = computeThresholds(forecasts)
+  const barColor = m => m <= greenMax ? '#22c55e' : m <= amberMax ? '#f59e0b' : '#ef4444'
+  const textClass = m => m <= greenMax ? 'text-emerald-600' : m <= amberMax ? 'text-amber-600' : 'text-red-600'
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -58,10 +77,7 @@ export default function ForecastChart({ progress, history }) {
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="monthsToComplete" radius={[0, 4, 4, 0]} barSize={16}>
             {forecasts.map((f, i) => (
-              <Cell
-                key={i}
-                fill={f.monthsToComplete <= 3 ? '#22c55e' : f.monthsToComplete <= 6 ? '#f59e0b' : '#ef4444'}
-              />
+              <Cell key={i} fill={barColor(f.monthsToComplete)} />
             ))}
           </Bar>
         </BarChart>
@@ -74,9 +90,7 @@ export default function ForecastChart({ progress, history }) {
             <div className="flex items-center gap-4">
               <span className="text-stone-400">{f.currentProgress}% done</span>
               <span className="text-stone-400">{f.velocity}%/mo</span>
-              <span className={`font-medium ${
-                f.monthsToComplete <= 3 ? 'text-emerald-600' : f.monthsToComplete <= 6 ? 'text-amber-600' : 'text-red-600'
-              }`}>
+              <span className={`font-medium ${textClass(f.monthsToComplete)}`}>
                 {f.monthsToComplete === 0 ? 'Complete' : f.estimatedCompletion}
               </span>
             </div>
@@ -87,15 +101,15 @@ export default function ForecastChart({ progress, history }) {
       <div className="flex gap-4 mt-3 justify-end text-xs">
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />
-          <span className="text-stone-500">≤3 mo</span>
+          <span className="text-stone-500">≤{greenMax} mo</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
-          <span className="text-stone-500">3-6 mo</span>
+          <span className="text-stone-500">{greenMax}-{amberMax} mo</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-sm bg-red-500" />
-          <span className="text-stone-500">&gt;6 mo</span>
+          <span className="text-stone-500">&gt;{amberMax} mo</span>
         </div>
       </div>
     </div>
