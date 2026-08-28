@@ -2,106 +2,84 @@
   "source": "IFC Model - Amtrack Southampton Yard.ifc",
   "software": "SDS2 v2023.09",
   "schema": "IFC2X3",
-  "totalElements": 55261,
+  "totalElements": 15520,
   "totalWeightTons": 1506,
   "elementTypes": {
     "beams": 2783,
     "columns": 5306,
-    "members": 7431,
-    "plates": 16159,
-    "fasteners": 20757,
-    "other": 2825
+    "members": 7431
   },
   "zones": {
     "Seq 9-11": {
-      "elements": 11042,
+      "elements": 3594,
       "weight_tons": 386,
       "beams": 512,
-      "plates": 1796,
       "members": 1945,
-      "fasteners": 5084,
       "columns": 1137,
       "braces": 675
     },
     "Seq 1-2": {
-      "elements": 8184,
+      "elements": 3234,
       "weight_tons": 328,
       "beams": 336,
-      "plates": 1620,
       "members": 1721,
-      "fasteners": 2952,
       "columns": 1177,
       "braces": 290
     },
     "Seq 6-8": {
-      "elements": 8431,
+      "elements": 3134,
       "weight_tons": 288,
       "beams": 423,
-      "plates": 1768,
       "members": 1542,
-      "fasteners": 3240,
       "columns": 1169,
       "braces": 315
     },
     "Seq 3-5": {
-      "elements": 8911,
+      "elements": 3159,
       "weight_tons": 280,
       "beams": 418,
-      "plates": 1688,
       "members": 1656,
-      "fasteners": 3624,
       "columns": 1085,
       "braces": 336
     },
     "Canopies & Existing": {
-      "elements": 1011,
+      "elements": 837,
       "weight_tons": 194,
       "beams": 829,
-      "plates": 51,
       "members": 0,
-      "fasteners": 0,
       "columns": 8,
       "braces": 0
     },
     "Seq 18-20": {
-      "elements": 1603,
+      "elements": 211,
       "weight_tons": 30,
       "beams": 11,
-      "plates": 427,
       "members": 200,
-      "fasteners": 717,
       "columns": 0,
       "braces": 0
     },
     "ABM & Misc": {
-      "elements": 14764,
+      "elements": 368,
       "weight_tons": 0,
       "beams": 105,
-      "plates": 8157,
       "members": 142,
-      "fasteners": 5140,
       "columns": 121,
       "braces": 41
     },
     "Seq 12-17": {
-      "elements": 1315,
+      "elements": 983,
       "weight_tons": 0,
       "beams": 149,
-      "plates": 652,
       "members": 225,
-      "fasteners": 0,
       "columns": 609,
       "braces": 0
     }
   },
   "memberTypes": {
-    "SAG ROD": 17780,
-    "BEAM": 11148,
-    "MISC": 8217,
     "COLUMN": 5306,
+    "BEAM": 2783,
     "VERTICAL BRACE": 1643,
     "JOIST": 738,
-    "PLATE": 49,
     "HORIZONTAL BRACE": 14
   }
 }

@@ -2,18 +2,12 @@ const typeColors = {
   beams: '#3b82f6',
   columns: '#6366f1',
   members: '#22c55e',
-  plates: '#8b5cf6',
-  fasteners: '#f59e0b',
-  other: '#a8a29e',
 }
 
 const typeLabels = {
   beams: 'Beams',
   columns: 'Columns',
   members: 'Members',
-  plates: 'Plates',
-  fasteners: 'Fasteners',
-  other: 'Other',
 }
 
 export default function IfcModelSummary({ data }) {
