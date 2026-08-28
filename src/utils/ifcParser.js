@@ -1,5 +1,19 @@
 import * as WebIFC from 'web-ifc'
 
+const STRUCTURAL_NAMES = new Set([
+  'BEAM', 'COLUMN', 'BRACE', 'ANGLE', 'ANGLE BRACE', 'VERTICAL BRACE',
+  'KICKER BRACE', 'ELEVATOR BEAM', 'ELEVATOR POST', 'POST', 'FRAME',
+  'HSS BEAM', 'HANDRAIL', 'SCREEN', 'BRB', 'EMBED CHANNEL',
+  'DOOR JAMB ANGLE', 'DECK ANGLE', 'STOCK ANGLE',
+])
+
+function nameToCategory(name) {
+  const n = (name || '').toUpperCase()
+  if (['BEAM', 'HSS BEAM', 'ELEVATOR BEAM', 'HANDRAIL'].includes(n)) return 'beams'
+  if (['COLUMN', 'POST', 'ELEVATOR POST'].includes(n)) return 'columns'
+  return 'members'
+}
+
 export async function parseIfcFile(arrayBuffer) {
   const ifcApi = new WebIFC.IfcAPI()
   await ifcApi.Init()
@@ -33,6 +47,20 @@ export async function parseIfcFile(arrayBuffer) {
     }
   } catch {}
 
+  const isTekla = summary.software.toLowerCase().includes('tekla')
+    || await detectTeklaByProps(ifcApi, modelID)
+
+  if (isTekla) {
+    parseTeklaModel(ifcApi, modelID, summary)
+  } else {
+    parseSds2Model(ifcApi, modelID, summary)
+  }
+
+  ifcApi.CloseModel(modelID)
+  return summary
+}
+
+function parseSds2Model(ifcApi, modelID, summary) {
   const typeMap = {
     [WebIFC.IFCBEAM]: 'beams',
     [WebIFC.IFCCOLUMN]: 'columns',
@@ -81,21 +109,124 @@ export async function parseIfcFile(arrayBuffer) {
   }
 
   summary.totalWeightTons = Math.round(totalWeightLbs / 2000 * 10) / 10
+  finalizeSummary(seqData, summary)
+}
 
-  for (const [seq, sd] of Object.entries(seqData)) {
+function parseTeklaModel(ifcApi, modelID, summary) {
+  const propMap = buildPropertyMap(ifcApi, modelID)
+
+  const assemblyIds = ifcApi.GetLineIDsWithType(modelID, WebIFC.IFCELEMENTASSEMBLY)
+  const seqData = {}
+  let totalWeightKg = 0
+
+  for (let i = 0; i < assemblyIds.size(); i++) {
+    const id = assemblyIds.get(i)
+    const line = ifcApi.GetLine(modelID, id)
+    const name = (line.Name?.value || '').toUpperCase()
+
+    if (!STRUCTURAL_NAMES.has(name)) continue
+
+    const category = nameToCategory(name)
+    summary.totalElements++
+    summary.elementTypes[category]++
+
+    const props = propMap[id] || {}
+    const weight = props['Assembly/Cast unit weight'] || props['Weight'] || 0
+    const phase = props['Phase'] || 'Unknown'
+
+    if (!seqData[phase]) {
+      seqData[phase] = { elements: 0, weight_tons: 0, beams: 0, columns: 0, members: 0, braces: 0 }
+    }
+    const sd = seqData[phase]
+    sd.elements++
+
+    if (typeof weight === 'number' && weight > 0) {
+      sd.weight_tons += weight / 1000
+      totalWeightKg += weight
+    }
+
+    if (category === 'beams') sd.beams++
+    else if (category === 'columns') sd.columns++
+    else if (category === 'members') sd.members++
+
+    summary.memberTypes[name] = (summary.memberTypes[name] || 0) + 1
+    if (name.includes('BRACE')) sd.braces++
+  }
+
+  summary.totalWeightTons = Math.round(totalWeightKg / 1000 * 10) / 10
+  finalizeSummary(seqData, summary)
+}
+
+function buildPropertyMap(ifcApi, modelID) {
+  const map = {}
+  const relIds = ifcApi.GetLineIDsWithType(modelID, WebIFC.IFCRELDEFINESBYPROPERTIES)
+
+  for (let i = 0; i < relIds.size(); i++) {
+    try {
+      const rel = ifcApi.GetLine(modelID, relIds.get(i))
+      const psetRef = rel.RelatingPropertyDefinition
+      if (!psetRef) continue
+
+      const psetId = psetRef.value || psetRef.expressID || psetRef
+      if (typeof psetId !== 'number') continue
+
+      const pset = ifcApi.GetLine(modelID, psetId)
+      const psetName = pset.Name?.value || ''
+      if (psetName !== 'Tekla Assembly' && psetName !== 'Tekla Common' && psetName !== 'Tekla Quantity') continue
+
+      const psetProps = {}
+      if (pset.HasProperties) {
+        for (const propRef of pset.HasProperties) {
+          const propId = propRef.value || propRef.expressID || propRef
+          if (typeof propId !== 'number') continue
+          try {
+            const prop = ifcApi.GetLine(modelID, propId)
+            if (prop.Name?.value && prop.NominalValue?.value !== undefined) {
+              psetProps[prop.Name.value] = prop.NominalValue.value
+            }
+          } catch {}
+        }
+      }
+
+      const objects = rel.RelatedObjects || []
+      for (const objRef of objects) {
+        const objId = objRef.value || objRef.expressID || objRef
+        if (typeof objId !== 'number') continue
+        if (!map[objId]) map[objId] = {}
+        Object.assign(map[objId], psetProps)
+      }
+    } catch {}
+  }
+
+  return map
+}
+
+function finalizeSummary(seqData, summary) {
+  for (const sd of Object.values(seqData)) {
     sd.weight_tons = Math.round(sd.weight_tons * 100) / 100
   }
   summary.zones = Object.fromEntries(
     Object.entries(seqData).sort((a, b) => b[1].weight_tons - a[1].weight_tons)
   )
-
   summary.memberTypes = Object.fromEntries(
     Object.entries(summary.memberTypes).sort((a, b) => b[1] - a[1])
   )
+}
 
-  ifcApi.CloseModel(modelID)
-
-  return summary
+async function detectTeklaByProps(ifcApi, modelID) {
+  try {
+    const relIds = ifcApi.GetLineIDsWithType(modelID, WebIFC.IFCRELDEFINESBYPROPERTIES)
+    for (let i = 0; i < Math.min(20, relIds.size()); i++) {
+      const rel = ifcApi.GetLine(modelID, relIds.get(i))
+      const psetRef = rel.RelatingPropertyDefinition
+      if (!psetRef) continue
+      const psetId = psetRef.value || psetRef.expressID || psetRef
+      if (typeof psetId !== 'number') continue
+      const pset = ifcApi.GetLine(modelID, psetId)
+      if (pset.Name?.value?.startsWith('Tekla')) return true
+    }
+  } catch {}
+  return false
 }
 
 function getElementProperties(ifcApi, modelID, elementId) {

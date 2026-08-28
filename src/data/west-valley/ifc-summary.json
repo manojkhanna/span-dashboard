@@ -1,0 +1,108 @@
+{
+  "source": "WVH_COORDINATES (08-03-2026).ifc",
+  "software": "Tekla Structures 2023 SP14",
+  "schema": "IFC2X3",
+  "totalElements": 8323,
+  "totalWeightTons": 3288,
+  "elementTypes": {
+    "beams": 5486,
+    "columns": 935,
+    "members": 1902
+  },
+  "zones": {
+    "Tower Tier-1": {
+      "elements": 2349,
+      "weight_tons": 928,
+      "beams": 1549,
+      "columns": 264,
+      "members": 536,
+      "braces": 0
+    },
+    "Hospital Tier-1": {
+      "elements": 1283,
+      "weight_tons": 507,
+      "beams": 846,
+      "columns": 144,
+      "members": 293,
+      "braces": 0
+    },
+    "Tower Tier-2": {
+      "elements": 1148,
+      "weight_tons": 454,
+      "beams": 757,
+      "columns": 129,
+      "members": 262,
+      "braces": 0
+    },
+    "MOB Tier-1": {
+      "elements": 1048,
+      "weight_tons": 414,
+      "beams": 691,
+      "columns": 118,
+      "members": 239,
+      "braces": 0
+    },
+    "MOB Tier-2": {
+      "elements": 688,
+      "weight_tons": 272,
+      "beams": 454,
+      "columns": 77,
+      "members": 157,
+      "braces": 0
+    },
+    "MOB Tier-3": {
+      "elements": 653,
+      "weight_tons": 258,
+      "beams": 430,
+      "columns": 73,
+      "members": 150,
+      "braces": 0
+    },
+    "Tower Tier-3": {
+      "elements": 607,
+      "weight_tons": 240,
+      "beams": 400,
+      "columns": 68,
+      "members": 139,
+      "braces": 0
+    },
+    "Elevator steel": {
+      "elements": 215,
+      "weight_tons": 85,
+      "beams": 75,
+      "columns": 108,
+      "members": 32,
+      "braces": 0
+    },
+    "Helipad, Screen Wall": {
+      "elements": 177,
+      "weight_tons": 70,
+      "beams": 155,
+      "columns": 3,
+      "members": 19,
+      "braces": 0
+    },
+    "Hospital Tier-2": {
+      "elements": 155,
+      "weight_tons": 60,
+      "beams": 129,
+      "columns": 12,
+      "members": 14,
+      "braces": 0
+    }
+  },
+  "memberTypes": {
+    "BEAM": 5404,
+    "ANGLE": 1201,
+    "COLUMN": 600,
+    "ELEVATOR POST": 277,
+    "KICKER BRACE": 194,
+    "BRB": 184,
+    "FRAME": 78,
+    "ELEVATOR BEAM": 75,
+    "VERTICAL BRACE": 74,
+    "SCREEN": 61,
+    "POST": 58,
+    "ANGLE BRACE": 29
+  }
+}

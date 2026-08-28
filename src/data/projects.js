@@ -19,6 +19,7 @@ import westValleyErrors from './west-valley/errors.json'
 import westValleyRfi from './west-valley/rfi.json'
 import westValleyHistory from './west-valley/history.json'
 import westValleySchedule from './west-valley/schedule.json'
+import westValleyIfc from './west-valley/ifc-summary.json'
 
 const UPLOADED_KEY = 'span_uploaded_projects'
 const OVERRIDES_KEY = 'span_project_overrides'
@@ -74,6 +75,7 @@ const builtInProjects = {
     rfi: westValleyRfi,
     history: westValleyHistory,
     schedule: westValleySchedule,
+    ifc: westValleyIfc,
   },
 }
 
