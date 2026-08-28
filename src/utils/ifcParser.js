@@ -13,7 +13,7 @@ export async function parseIfcFile(arrayBuffer) {
     schema: '',
     totalElements: 0,
     totalWeightTons: 0,
-    elementTypes: { beams: 0, plates: 0, members: 0, fasteners: 0, other: 0 },
+    elementTypes: { beams: 0, columns: 0, members: 0, plates: 0, fasteners: 0, other: 0 },
     zones: {},
     memberTypes: {},
   }
@@ -35,13 +35,15 @@ export async function parseIfcFile(arrayBuffer) {
 
   const typeMap = {
     [WebIFC.IFCBEAM]: 'beams',
-    [WebIFC.IFCPLATE]: 'plates',
+    [WebIFC.IFCCOLUMN]: 'columns',
     [WebIFC.IFCMEMBER]: 'members',
+    [WebIFC.IFCPLATE]: 'plates',
     [WebIFC.IFCMECHANICALFASTENER]: 'fasteners',
     [WebIFC.IFCELEMENTASSEMBLY]: 'other',
     [WebIFC.IFCDISCRETEACCESSORY]: 'other',
-    [WebIFC.IFCCOLUMN]: 'beams',
   }
+
+  const weightTypes = new Set([WebIFC.IFCBEAM, WebIFC.IFCCOLUMN, WebIFC.IFCMEMBER])
 
   const structuralTypes = Object.keys(typeMap).map(Number)
   const seqData = {}
@@ -50,15 +52,19 @@ export async function parseIfcFile(arrayBuffer) {
   for (const ifcType of structuralTypes) {
     const ids = ifcApi.GetLineIDsWithType(modelID, ifcType)
     const category = typeMap[ifcType]
+    const countsForWeight = weightTypes.has(ifcType)
 
     for (let i = 0; i < ids.size(); i++) {
       const id = ids.get(i)
       summary.totalElements++
-      summary.elementTypes[category]++
+      if (summary.elementTypes[category] !== undefined) {
+        summary.elementTypes[category]++
+      } else {
+        summary.elementTypes.other++
+      }
 
       const props = getElementProperties(ifcApi, modelID, id)
       const seq = props.Sequence || props.sequence || 'Unknown'
-      const weight = props.Net_Weight || props.Member_Net_Weight || props.net_weight || 0
       const memberType = props.Member_Type || props.member_type || ''
 
       if (!seqData[seq]) {
@@ -66,20 +72,24 @@ export async function parseIfcFile(arrayBuffer) {
       }
       const sd = seqData[seq]
       sd.elements++
-      if (typeof weight === 'number' && weight > 0) {
-        sd.weight_tons += weight / 2000
-        totalWeightLbs += weight
+
+      if (countsForWeight) {
+        const weight = props.Net_Weight || props.Member_Net_Weight || props.net_weight || 0
+        if (typeof weight === 'number' && weight > 0) {
+          sd.weight_tons += weight / 2000
+          totalWeightLbs += weight
+        }
       }
 
       if (category === 'beams') sd.beams++
-      else if (category === 'plates') sd.plates++
+      else if (category === 'columns') sd.columns++
       else if (category === 'members') sd.members++
+      else if (category === 'plates') sd.plates++
       else if (category === 'fasteners') sd.fasteners++
 
       if (memberType) {
         const mt = memberType.toUpperCase()
         summary.memberTypes[mt] = (summary.memberTypes[mt] || 0) + 1
-        if (mt.includes('COLUMN')) sd.columns++
         if (mt.includes('BRACE')) sd.braces++
       }
     }
