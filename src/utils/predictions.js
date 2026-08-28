@@ -267,18 +267,35 @@ export function computeSequenceForecasts(progress, history) {
 
   const progressSmooth = holtSmooth(history.map(h => h.progress))
   const monthlyGain = Math.max(progressSmooth.trend, 0.5)
+  const velocity = +(monthlyGain * 0.8).toFixed(1)
+
+  // Detect data format: when totalProgress ≈ modelProgress for all sequences,
+  // it's the raw completion % (Amtrak). Otherwise totalProgress is the weighted
+  // project contribution (contribution × completion) and needs normalizing.
+  const withProgress = progress.filter(s => (s.totalProgress || 0) > 0)
+  const isDirectProgress = withProgress.length > 0 &&
+    withProgress.every(s => Math.abs((s.totalProgress || 0) - (s.modelProgress || 0)) < 2)
 
   return progress.map(seq => {
-    const current = seq.totalProgress || seq.overallProgress || 0
+    let completion
+    if (isDirectProgress) {
+      completion = seq.totalProgress || seq.modelProgress || 0
+    } else if (seq.contribution > 0) {
+      completion = Math.min(100, (seq.totalProgress || 0) / seq.contribution)
+    } else {
+      completion = seq.modelProgress || 0
+    }
+
+    const current = Math.round(completion * 10) / 10
     const remaining = 100 - current
-    const monthsToComplete = remaining <= 0 ? 0 : Math.ceil(remaining / (monthlyGain * 0.8))
+    const monthsToComplete = remaining <= 0 ? 0 : Math.ceil(remaining / velocity)
     const now = new Date()
     const estComplete = new Date(now.getFullYear(), now.getMonth() + monthsToComplete, 1)
 
     return {
       sequence: seq.sequence,
       currentProgress: current,
-      velocity: +(monthlyGain * 0.8).toFixed(1),
+      velocity,
       monthsToComplete,
       estimatedCompletion: estComplete.toISOString().slice(0, 7),
       phase: seq.phase,
