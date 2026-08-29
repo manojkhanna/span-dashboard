@@ -199,7 +199,7 @@ export default function ProjectDashboard() {
 
         {/* Row 4: Forecast */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ForecastChart progress={progress} history={history} />
+          <ForecastChart progress={progress} history={history} schedule={schedule} />
           {!ifc && <WeightBreakdown data={progress} project={project} />}
         </div>
 

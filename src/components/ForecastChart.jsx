@@ -33,8 +33,8 @@ function computeThresholds(forecasts) {
   return { green: sorted[0], amber: sorted[0] }
 }
 
-export default function ForecastChart({ progress, history }) {
-  const forecasts = computeSequenceForecasts(progress, history)
+export default function ForecastChart({ progress, history, schedule }) {
+  const forecasts = computeSequenceForecasts(progress, history, schedule)
 
   if (forecasts.length === 0) {
     return (

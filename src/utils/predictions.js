@@ -262,16 +262,26 @@ export function generateRecommendations(data) {
   return recs
 }
 
-export function computeSequenceForecasts(progress, history) {
+export function computeSequenceForecasts(progress, history, schedule) {
   if (!progress || !history || history.length < 2) return []
 
   const progressSmooth = holtSmooth(history.map(h => h.progress))
-  const monthlyGain = Math.max(progressSmooth.trend, 0.5)
-  const velocity = +(monthlyGain * 0.8).toFixed(1)
+  const trendVelocity = Math.max(progressSmooth.trend, 0.5) * 0.8
 
-  // Detect data format: when totalProgress ≈ modelProgress for all sequences,
-  // it's the raw completion % (Amtrak). Otherwise totalProgress is the weighted
-  // project contribution (contribution × completion) and needs normalizing.
+  let scheduleVelocity = 0
+  if (schedule && schedule.length > 0 && history.length > 0) {
+    const projectStart = new Date(history[0].month + '-01')
+    const dates = schedule.filter(m => m.planned).map(m => new Date(m.planned))
+    if (dates.length > 0) {
+      const projectEnd = new Date(Math.max(...dates))
+      const months = (projectEnd.getFullYear() - projectStart.getFullYear()) * 12
+        + (projectEnd.getMonth() - projectStart.getMonth())
+      if (months > 0) scheduleVelocity = 100 / months
+    }
+  }
+
+  const velocity = +Math.max(trendVelocity, scheduleVelocity).toFixed(1)
+
   const withProgress = progress.filter(s => (s.totalProgress || 0) > 0)
   const isDirectProgress = withProgress.length > 0 &&
     withProgress.every(s => Math.abs((s.totalProgress || 0) - (s.modelProgress || 0)) < 2)
